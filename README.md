@@ -27,7 +27,7 @@ salt.barplot(x="day", y="total_bill", data=tips)
 ## Limitations
 
 This is only a proof of concept at this time.
-Only `barplot`, `countplot`, `pointplot`, `stripplot` are currently supported with limited support.
+Only `barplot`, `countplot`, `pointplot`, `stripplot` are currently available with limited support.
 
 Contributions and suggestions welcome!
 
