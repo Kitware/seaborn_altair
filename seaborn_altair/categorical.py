@@ -2,32 +2,22 @@ import seaborn as sns
 import numpy as np
 import altair as alt
 import pandas as pd
+import warnings
 from scipy import stats
 
-from seaborn.categorical import _CategoricalStatPlotter, _CategoricalPlotter, _CategoricalScatterPlotter
+from seaborn.categorical import (
+    _BarPlotter,
+    _BoxPlotter,
+    _PointPlotter,
+    _StripPlotter,
+)
 from seaborn.palettes import color_palette
 from seaborn.external.six import string_types
 
 __all__ = ["boxplot", "stripplot", "pointplot", "barplot", "countplot"]
 
-class _BarPlotterAltair(_CategoricalStatPlotter):
+class _BarPlotterAltair(_BarPlotter):
     """Show point estimates and confidence intervals with bars."""
-
-    def __init__(self, x, y, hue, data, order, hue_order,
-                 estimator, ci, n_boot, units,
-                 orient, color, palette, saturation, errcolor,
-                 errwidth, capsize, dodge):
-        """Initialize the plotter."""
-        self.establish_variables(x, y, hue, data, orient,
-                                 order, hue_order, units)
-        self.establish_colors(color, palette, saturation)
-        self.estimate_statistic(estimator, ci, n_boot)
-
-        self.dodge = dodge
-
-        self.errcolor = errcolor
-        self.errwidth = errwidth
-        self.capsize = capsize
 
     def draw_bars(self, ax, kws):
         """Draw the bars onto `ax`."""
@@ -168,59 +158,7 @@ def countplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
     return ax
 
 
-class _PointPlotter(_CategoricalStatPlotter):
-
-    default_palette = "dark"
-
-    """Show point estimates and confidence intervals with (joined) points."""
-    def __init__(self, x, y, hue, data, order, hue_order,
-                 estimator, ci, n_boot, units,
-                 markers, linestyles, dodge, join, scale,
-                 orient, color, palette, errwidth=None, capsize=None):
-        """Initialize the plotter."""
-        self.establish_variables(x, y, hue, data, orient,
-                                 order, hue_order, units)
-        self.establish_colors(color, palette, 1)
-        self.estimate_statistic(estimator, ci, n_boot)
-
-        # Override the default palette for single-color plots
-        if hue is None and color is None and palette is None:
-            self.colors = [color_palette()[0]] * len(self.colors)
-
-        # Don't join single-layer plots with different colors
-        if hue is None and palette is not None:
-            join = False
-
-        # Use a good default for `dodge=True`
-        if dodge is True and self.hue_names is not None:
-            dodge = .025 * len(self.hue_names)
-
-        # Make sure we have a marker for each hue level
-        if isinstance(markers, string_types):
-            markers = [markers] * len(self.colors)
-        self.markers = markers
-
-        # Make sure we have a line style for each hue level
-        if isinstance(linestyles, string_types):
-            linestyles = [linestyles] * len(self.colors)
-        self.linestyles = linestyles
-
-        # Set the other plot components
-        self.dodge = dodge
-        self.join = join
-        self.scale = scale
-        self.errwidth = errwidth
-        self.capsize = capsize
-
-    @property
-    def hue_offsets(self):
-        """Offsets relative to the center position for each hue level."""
-        if self.dodge:
-            offset = np.linspace(0, self.dodge, len(self.hue_names))
-            offset -= offset.mean()
-        else:
-            offset = np.zeros(len(self.hue_names))
-        return offset
+class _PointPlotterAltair(_PointPlotter):
 
     def draw_points(self, ax):
         """Draw the main data components of the plot."""
@@ -306,10 +244,10 @@ def pointplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
               orient=None, color=None, palette=None, errwidth=None,
               capsize=None, ax=None, **kwargs):
 
-    plotter = _PointPlotter(x, y, hue, data, order, hue_order,
-                            estimator, ci, n_boot, units,
-                            markers, linestyles, dodge, join, scale,
-                            orient, color, palette, errwidth, capsize)
+    plotter = _PointPlotterAltair(x, y, hue, data, order, hue_order,
+                                  estimator, ci, n_boot, units,
+                                  markers, linestyles, dodge, join, scale,
+                                  orient, color, palette, errwidth, capsize)
 
     if ax is None:
         ax = alt.Chart()
@@ -318,25 +256,8 @@ def pointplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
     return ax
 
 
-class _StripPlotter(_CategoricalScatterPlotter):
+class _StripPlotterAltair(_StripPlotter):
     """1-d scatterplot with categorical organization."""
-    def __init__(self, x, y, hue, data, order, hue_order,
-                 jitter, dodge, orient, color, palette):
-        """Initialize the plotter."""
-        self.establish_variables(x, y, hue, data, orient, order, hue_order)
-        self.establish_colors(color, palette, 1)
-
-        # Set object attributes
-        self.dodge = dodge
-        self.width = .8
-
-        if jitter == 1:  # Use a good default for `jitter = True`
-            jlim = 0.1
-        else:
-            jlim = float(jitter)
-        if self.hue_names is not None and dodge:
-            jlim /= len(self.hue_names)
-        self.jitterer = stats.uniform(-jlim, jlim * 2).rvs
 
     def draw_stripplot(self, ax, kws):
         """Draw the points onto `ax`."""
@@ -404,8 +325,8 @@ def stripplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
         msg = "The `split` parameter has been renamed to `dodge`."
         warnings.warn(msg, UserWarning)
 
-    plotter = _StripPlotter(x, y, hue, data, order, hue_order,
-                            jitter, dodge, orient, color, palette)
+    plotter = _StripPlotterAltair(x, y, hue, data, order, hue_order,
+                                  jitter, dodge, orient, color, palette)
     if ax is None:
         ax = alt.Chart()
 
@@ -423,21 +344,7 @@ def stripplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
     return ax
 
 
-class _BoxPlotterAltair(_CategoricalPlotter):
-    def __init__(self, x, y, hue, data, order, hue_order,
-                 orient, color, palette, saturation,
-                 width, dodge, fliersize, linewidth):
-
-        self.establish_variables(x, y, hue, data, orient, order, hue_order)
-        self.establish_colors(color, palette, saturation)
-
-        self.dodge = dodge
-        self.width = width
-        self.fliersize = fliersize
-
-        # if linewidth is None:
-        #     linewidth = mpl.rcParams["lines.linewidth"]
-        self.linewidth = linewidth
+class _BoxPlotterAltair(_BoxPlotter):
 
     def draw_boxplot(self, ax, kws):
         """Use Altair to draw a boxplot on an Axes."""
