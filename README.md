@@ -24,6 +24,8 @@ tips = sns.load_dataset("tips")
 salt.barplot(x="day", y="total_bill", data=tips)
 ```
 
+![barplot](https://github.com/kitware/seaborn_altair/raw/master/img/visualization.png)
+
 ## Limitations
 
 This is only a proof of concept at this time.
