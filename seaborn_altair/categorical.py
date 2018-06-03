@@ -4,17 +4,14 @@ import altair as alt
 import pandas as pd
 from scipy import stats
 
-from seaborn.categorical import _CategoricalStatPlotter
-from seaborn.categorical import _CategoricalScatterPlotter
+from seaborn.categorical import _CategoricalStatPlotter, _CategoricalPlotter, _CategoricalScatterPlotter
 from seaborn.palettes import color_palette
 from seaborn.external.six import string_types
 
-__all__ = ["stripplot", "pointplot", "barplot", "countplot"]
+__all__ = ["boxplot", "stripplot", "pointplot", "barplot", "countplot"]
 
 class _BarPlotterAltair(_CategoricalStatPlotter):
     """Show point estimates and confidence intervals with bars."""
-
-    import altair as alt
 
     def __init__(self, x, y, hue, data, order, hue_order,
                  estimator, ci, n_boot, units,
@@ -99,7 +96,6 @@ class _BarPlotterAltair(_CategoricalStatPlotter):
             chart = alt.layer(chart, error_bars)
         else:
             chart = alt.Chart(data).mark_bar().encode(**encodings)
-            import json
 
         if self.plot_hues is not None:
             facet_dir = "column" if self.orient == "v" else "row"
@@ -422,6 +418,132 @@ def stripplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
     kwargs.update(dict(s=size ** 2,
                        edgecolor=edgecolor,
                        linewidth=linewidth))
+
+    ax = plotter.plot(ax, kwargs)
+    return ax
+
+
+class _BoxPlotterAltair(_CategoricalPlotter):
+    def __init__(self, x, y, hue, data, order, hue_order,
+                 orient, color, palette, saturation,
+                 width, dodge, fliersize, linewidth):
+
+        self.establish_variables(x, y, hue, data, orient, order, hue_order)
+        self.establish_colors(color, palette, saturation)
+
+        self.dodge = dodge
+        self.width = width
+        self.fliersize = fliersize
+
+        # if linewidth is None:
+        #     linewidth = mpl.rcParams["lines.linewidth"]
+        self.linewidth = linewidth
+
+    def draw_boxplot(self, ax, kws):
+        """Use Altair to draw a boxplot on an Axes."""
+
+        altx, alty = alt.X, alt.Y
+        xprop, yprop = "x", "y"
+        x, y = self.group_label, self.value_label
+        xtitle = x
+        if not x:
+            x = "group"
+            xtitle = ""
+
+        if self.plot_hues is not None:
+            column = x
+            x = self.hue_title
+            xtitle = ""
+
+        groups = self.group_names
+        if not len(self.group_names):
+            groups = [""]
+
+        if self.plot_hues is not None:
+            hues = {h: i for (i, h) in enumerate(self.hue_names)}
+            rgb_colors = ["rgb(%s, %s, %s)" % tuple(comp*255 for comp in self.colors[hues[d]]) for g in self.plot_hues for d in g]
+            hue_name = [d for g in self.plot_hues for d in g]
+            cols = {
+                column: [groups[i] for i in range(len(self.plot_data)) for d in self.plot_data[i]],
+                y: [d for g in self.plot_data for d in g],
+                x: hue_name,
+                "c": rgb_colors,
+            }
+            data = pd.DataFrame(cols)
+        else:
+            rgb_colors = ["rgb(%s, %s, %s)" % tuple(comp*255 for comp in self.colors[i]) for i in range(len(self.plot_data)) for d in self.plot_data[i]]
+            cols = {
+                x: [groups[i] for i in range(len(self.plot_data)) for d in self.plot_data[i]],
+                y: [d for g in self.plot_data for d in g],
+                "c": rgb_colors,
+            }
+            data = pd.DataFrame(cols)
+
+        if self.orient == "h":
+            altx, alty = alty, altx
+            xprop, yprop = yprop, xprop
+
+        # Define aggregate fields
+        lower_box = 'q1(%s):Q' % y
+        lower_whisker = 'min(%s):Q' % y
+        upper_box = 'q3(%s):Q' % y
+        upper_whisker = 'max(%s):Q' % y
+
+        xval = altx(x, axis=alt.Axis(title=xtitle), sort=None)
+
+        # Compose each layer individually
+        lower_plot = alt.Chart().mark_rule().encode(**{
+            yprop: alty(lower_whisker, axis=alt.Axis(title=y)),
+            "%s2" % yprop: lower_box,
+            xprop: xval,
+        })
+
+        middle_plot = alt.Chart().mark_bar().encode(**{
+            yprop: lower_box,
+            "%s2" % yprop: upper_box,
+            "color": alt.Color("c", scale=None),
+            xprop: xval,
+        })
+
+        upper_plot = alt.Chart().mark_rule().encode(**{
+            yprop: upper_whisker,
+            "%s2" % yprop: upper_box,
+            xprop: xval,
+        })
+
+        middle_tick = alt.Chart().mark_tick(
+            size=18,
+            color='black',
+        ).encode(**{
+            yprop: 'median(%s):Q' % y,
+            xprop: xval,
+        })
+
+        chart = lower_plot + middle_plot + upper_plot + middle_tick
+
+        if self.plot_hues is not None:
+            facet_dir = "column" if self.orient == "v" else "row"
+            chart = chart.facet(**{facet_dir: "%s:N" % column})
+        chart.data = data
+        chart = chart.interactive()
+
+        return chart
+
+    def plot(self, ax, boxplot_kws):
+        """Make the plot."""
+        return self.draw_boxplot(ax, boxplot_kws)
+
+
+def boxplot(x=None, y=None, hue=None, data=None, order=None, hue_order=None,
+            orient=None, color=None, palette=None, saturation=.75,
+            width=.8, dodge=True, fliersize=5, linewidth=None,
+            whis=1.5, notch=False, ax=None, **kwargs):
+
+    plotter = _BoxPlotterAltair(x, y, hue, data, order, hue_order,
+                                orient, color, palette, saturation,
+                                width, dodge, fliersize, linewidth)
+
+    kwargs.update(dict(whis=whis, notch=notch))
 
     ax = plotter.plot(ax, kwargs)
     return ax
