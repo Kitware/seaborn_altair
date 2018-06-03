@@ -10,6 +10,8 @@ See the [interactive examples](https://kitware.github.io/seaborn_altair/) for cu
 pip install seaborn_altair
 ```
 
+Works in Jupyter lab or Jupyter notebooks.
+
 ## Usage
 
 ```python
