@@ -31,3 +31,6 @@ Only `barplot`, `countplot`, `pointplot`, `stripplot` are currently supported wi
 
 Contributions and suggestions welcome!
 
+# Credit
+
+Idea from [Jake VanderPlas](https://twitter.com/jakevdp/status/996041414596214784). [I](https://twitter.com/jeffbaumes) know Python and Vega-Lite reasonably well, so decided to give it a shot.
