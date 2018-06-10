@@ -62,13 +62,14 @@ if __name__ == "__main__":
                 source = "".join(c["source"]).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                 out.write("<div class=\"code\"><pre>%s</pre></div>" % source)
                 for o in c["outputs"]:
-                    vg = o["data"].get("application/vnd.vegalite.v2+json")
-                    img = o["data"].get("image/png")
-                    if vg:
-                        visid = "vis%s" % i
-                        out.write(vis % (visid, json.dumps(vg), visid))
-                    elif img:
-                        out.write("<img src=data:image/png;base64,%s>" % img)
+                    if o.get("data"):
+                        vg = o["data"].get("application/vnd.vegalite.v2+json")
+                        img = o["data"].get("image/png")
+                        if vg:
+                            visid = "vis%s" % i
+                            out.write(vis % (visid, json.dumps(vg), visid))
+                        elif img:
+                            out.write("<img src=data:image/png;base64,%s>" % img)
 
         out.write(footer)
 
