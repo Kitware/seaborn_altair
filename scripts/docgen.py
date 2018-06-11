@@ -35,7 +35,6 @@ index_content = """
 with open('README.md') as readme:
     with open('docs/index.html', 'w') as index:
         md = readme.read().replace('```python', '```')
-        print(md)
         index.write(index_content % markdown.markdown(md))
 
 for p in os.listdir('./notebooks'):
