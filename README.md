@@ -2,27 +2,20 @@
 
 Seaborn-compatible API for interactive Vega-Lite plots via Altair.
 
-See the [interactive examples](https://kitware.github.io/seaborn_altair/) for current functionality and comparison to Seaborn.
-
 ## Installation
 
-```
-pip install seaborn_altair
-```
+    pip install seaborn_altair
 
 Works in Jupyter lab or Jupyter notebooks.
 
 ## Usage
 
-```python
-import seaborn_altair as salt
-import seaborn as sns
+    import seaborn_altair as salt
+    import seaborn as sns
+    tips = sns.load_dataset("tips")
 
-tips = sns.load_dataset("tips")
-
-# Use salt as you would sns
-salt.barplot(x="day", y="total_bill", data=tips)
-```
+    # Use salt as you would sns
+    salt.barplot(x="day", y="total_bill", data=tips)
 
 ![barplot](https://github.com/kitware/seaborn_altair/raw/master/img/visualization.png)
 

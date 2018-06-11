@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@3"></script>
+  <style>
+  .code {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    background: #f7f7f7;
+    border-color: #cfcfcf;
+    border-style: solid;
+    border-width: 1px;
+  }
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica,helvetica neue,ubuntu,roboto,noto,segoe ui,arial,sans-serif
+  }
+  .code > pre {
+    margin: 0px;
+  }
+  </style>
+</head>
+<body>
+<h1>seaborn_altair</h1>
+<p>Seaborn-compatible API for interactive Vega-Lite plots via Altair.</p>
+<p>See the <a href="https://kitware.github.io/seaborn_altair/">interactive examples</a> for current functionality and comparison to Seaborn.</p>
+<h2>Installation</h2>
+<pre><code>pip install seaborn_altair
+</code></pre>
+<p>Works in Jupyter lab or Jupyter notebooks.</p>
+<h2>Usage</h2>
+<pre><code>import seaborn_altair as salt
+import seaborn as sns
+tips = sns.load_dataset("tips")
+
+# Use salt as you would sns
+salt.barplot(x="day", y="total_bill", data=tips)
+</code></pre>
+<p><img alt="barplot" src="https://github.com/kitware/seaborn_altair/raw/master/img/visualization.png" /></p>
+<h2>API</h2>
+<p>This is only a proof of concept at this time. Only a subset of Seaborn plots (the ones with example links) are currently available with limited support.</p>
+<h3>Axis grids</h3>
+<ul>
+<li><a href="http://kitware.github.io/seaborn_altair/facetgrid.html">FacetGrid</a> Subplot grid for plotting conditional relationships.</li>
+<li>factorplot Draw a categorical plot onto a FacetGrid.</li>
+<li>lmplot Plot data and regression model fits across a FacetGrid.</li>
+<li>PairGrid Subplot grid for plotting pairwise relationships in a dataset.</li>
+<li>pairplot Plot pairwise relationships in a dataset.</li>
+<li>JointGrid Grid for drawing a bivariate plot with marginal univariate plots.</li>
+<li>jointplot Draw a plot of two variables with bivariate and univariate graphs.</li>
+</ul>
+<h3>Categorical plots</h3>
+<ul>
+<li><a href="http://kitware.github.io/seaborn_altair/stripplot.html">stripplot</a> Draw a scatterplot where one variable is categorical.</li>
+<li>swarmplot Draw a categorical scatterplot with non-overlapping points.</li>
+<li><a href="http://kitware.github.io/seaborn_altair/boxplot.html">boxplot</a> Draw a box plot to show distributions with respect to categories.</li>
+<li>violinplot Draw a combination of boxplot and kernel density estimate.</li>
+<li>lvplot Draw a letter value plot to show distributions of large datasets.</li>
+<li><a href="http://kitware.github.io/seaborn_altair/pointplot.html">pointplot</a> Show point estimates and confidence intervals using scatter plot glyphs.</li>
+<li><a href="http://kitware.github.io/seaborn_altair/barplot.html">barplot</a> Show point estimates and confidence intervals as rectangular bars.</li>
+<li><a href="http://kitware.github.io/seaborn_altair/countplot.html">countplot</a> Show the counts of observations in each categorical bin using bars.</li>
+</ul>
+<h3>Distribution plots</h3>
+<ul>
+<li>distplot Flexibly plot a univariate distribution of observations.</li>
+<li>kdeplot Fit and plot a univariate or bivariate kernel density estimate.</li>
+<li>rugplot Plot datapoints in an array as sticks on an axis.</li>
+</ul>
+<h3>Regression plots</h3>
+<ul>
+<li>regplot Plot data and a linear regression model fit.</li>
+<li>residplot Plot the residuals of a linear regression.</li>
+</ul>
+<h3>Matrix plots</h3>
+<ul>
+<li>heatmap Plot rectangular data as a color-encoded matrix.</li>
+<li>clustermap Plot a matrix dataset as a hierarchically-clustered heatmap.</li>
+</ul>
+<h3>Timeseries plots</h3>
+<ul>
+<li>tsplot Plot one or more timeseries with flexible representation of uncertainty.</li>
+</ul>
+<h3>Miscellaneous plots</h3>
+<ul>
+<li>palplot Plot the values in a color palette as a horizontal array.</li>
+</ul>
+<h3>matplotlib.pyplot utilities</h3>
+<ul>
+<li><a href="http://kitware.github.io/seaborn_altair/pyplot-hist.html">pyplot.hist</a></li>
+<li><a href="http://kitware.github.io/seaborn_altair/pyplot-plot.html">pyplot.plot</a></li>
+<li><a href="http://kitware.github.io/seaborn_altair/pyplot-scatter.html">pyplot.scatter</a></li>
+</ul>
+<h2>Credit</h2>
+<p>Idea from <a href="https://twitter.com/jakevdp/status/996041414596214784">Jake VanderPlas</a>. <a href="https://twitter.com/jeffbaumes">I</a> know Python and Vega-Lite reasonably well, so decided to give it a shot.</p>
+<p>Contributions and suggestions welcome!</p>
+</body>
+</html>
