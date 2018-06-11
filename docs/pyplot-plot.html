@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@3"></script>
+  <style>
+  .code {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    background: #f7f7f7;
+    border-color: #cfcfcf;
+    border-style: solid;
+    border-width: 1px;
+  }
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica,helvetica neue,ubuntu,roboto,noto,segoe ui,arial,sans-serif
+  }
+  .code > pre {
+    margin: 0px;
+  }
+  </style>
+</head>
+<body>
+<div><h1>seaborn_altair.pyplot.plot</h1></div><div class="code"><pre>import seaborn as sns
+import seaborn_altair.pyplot as palt
+attend = sns.load_dataset("attention")</pre></div><div class="code"><pre>palt.plot(attend[attend['subject'] == 1], 'solutions', 'score').interactive()</pre></div>
+  <div id="vis2"></div>
+  <script type="text/javascript">
+    var spec = {"$schema": "https://vega.github.io/schema/vega-lite/v2.4.1.json", "config": {"view": {"height": 300, "width": 400}}, "data": {"values": [{"Unnamed: 0": 0, "attention": "divided", "score": 2, "solutions": 1, "subject": 1}, {"Unnamed: 0": 20, "attention": "divided", "score": 4, "solutions": 2, "subject": 1}, {"Unnamed: 0": 40, "attention": "divided", "score": 7, "solutions": 3, "subject": 1}]}, "encoding": {"x": {"field": "solutions", "type": "quantitative"}, "y": {"field": "score", "type": "quantitative"}}, "mark": "line", "selection": {"selector001": {"bind": "scales", "encodings": ["x", "y"], "mark": {"fill": "#333", "fillOpacity": 0.125, "stroke": "white"}, "on": "[mousedown, window:mouseup] > window:mousemove!", "resolve": "global", "translate": "[mousedown, window:mouseup] > window:mousemove!", "type": "interval", "zoom": "wheel!"}}};
+    var opt = {"renderer": "canvas", "actions": false};
+    vegaEmbed("#vis2", spec, opt);
+  </script>
+<div class="code"><pre></pre></div>
+</body>
+</html>
