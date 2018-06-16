@@ -25,7 +25,7 @@ This is only a proof of concept at this time. Only a subset of Seaborn plots (th
 
 ### Axis grids
 * [FacetGrid](http://kitware.github.io/seaborn_altair/facetgrid.html) Subplot grid for plotting conditional relationships.
-* factorplot Draw a categorical plot onto a FacetGrid.
+* [factorplot](http://kitware.github.io/seaborn_altair/factorplot.html) Draw a categorical plot onto a FacetGrid.
 * lmplot Plot data and regression model fits across a FacetGrid.
 * PairGrid Subplot grid for plotting pairwise relationships in a dataset.
 * pairplot Plot pairwise relationships in a dataset.

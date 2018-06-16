@@ -1,11 +1,8 @@
 import altair as alt
 import numpy as np
 import warnings
-from matplotlib.colors import to_rgba
 
-def mpl_color(color):
-    c = to_rgba(color)
-    return "rgba(%s,%s,%s,%s)" % (c[0]*255, c[1]*255, c[2]*255, c[3])
+from .util import size_chart, vega_color, vega_palette
 
 def dtype_to_vega_type(t):
     if t == np.dtype('datetime64[ns]'):
@@ -14,9 +11,7 @@ def dtype_to_vega_type(t):
         return 'quantitative'
     return 'nominal'
 
-def hist(data, x, color=None, **kwargs):
-    for key in kwargs:
-        warnings.warn('hist argument "%s" is not supported' % key)
+def hist(x, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
     encodings = {
         "x": alt.X(bin=True, field=x, type="quantitative"),
         "y": alt.Y(aggregate="count", type="quantitative"),
@@ -25,13 +20,14 @@ def hist(data, x, color=None, **kwargs):
         if color in list(data.columns):
             encodings["color"] = alt.Color(field=color)
         else:
-            encodings["color"] = alt.Color(value=mpl_color(color))
+            encodings["color"] = alt.Color(value=vega_color(color))
 
-    return alt.Chart(data).mark_bar().encode(**encodings)
+    chart = alt.Chart(data).mark_bar().encode(**encodings)
+    size_chart(chart, size, aspect)
+    pal = vega_palette(palette, None, saturation)
+    return chart.configure_range(category=pal)
 
-def scatter(data, x, y, s=None, color=None, **kwargs):
-    for key in kwargs:
-        warnings.warn('scatter argument "%s" is not supported' % key)
+def scatter(x, y, s=None, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
     encodings = {
         "x": alt.X(field=x, type="quantitative"),
         "y": alt.Y(field=y, type="quantitative"),
@@ -40,13 +36,14 @@ def scatter(data, x, y, s=None, color=None, **kwargs):
         if color in list(data.columns):
             encodings["color"] = alt.Color(field=color, type="nominal")
         else:
-            encodings["color"] = alt.Color(value=mpl_color(color))
+            encodings["color"] = alt.Color(value=vega_color(color))
 
-    return alt.Chart(data).mark_circle().encode(**encodings)
+    chart = alt.Chart(data).mark_circle().encode(**encodings)
+    size_chart(chart, size, aspect)
+    pal = vega_palette(palette, None, saturation)
+    return chart.configure_range(category=pal)
 
-def plot(data, x, y, s=None, color=None, **kwargs):
-    for key in kwargs:
-        warnings.warn('plot argument "%s" is not supported' % key)
+def plot(x, y, s=None, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
     encodings = {
         "x": alt.X(field=x, type=dtype_to_vega_type(data[x].dtype)),
         "y": alt.Y(field=y, type="quantitative"),
@@ -55,6 +52,9 @@ def plot(data, x, y, s=None, color=None, **kwargs):
         if color in list(data.columns):
             encodings["color"] = alt.Color(field=color, type="nominal")
         else:
-            encodings["color"] = alt.Color(value=mpl_color(color))
+            encodings["color"] = alt.Color(value=vega_color(color))
 
-    return alt.Chart(data).mark_line().encode(**encodings)
+    chart = alt.Chart(data).mark_line().encode(**encodings)
+    size_chart(chart, size, aspect)
+    pal = vega_palette(palette, None, saturation)
+    return chart.configure_range(category=pal)
