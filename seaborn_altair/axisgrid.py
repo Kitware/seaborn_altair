@@ -32,13 +32,12 @@ class FacetGrid():
         raise ValueError('FacetGrid.map is not implemented. Use map_dataframe instead.')
 
     def map_dataframe(self, func, *args, **kwargs):
-        plot_kwargs = dict(kwargs)
-        if "color" not in plot_kwargs:
-            plot_kwargs.update(color=self.hue)
-        plot_kwargs.update(
+        plot_kwargs = dict(
+            color=self.hue,
             palette=self.palette, size=self.size,
             aspect=self.aspect, data=self.chart.data
         )
+        plot_kwargs.update(kwargs)
 
         single = func(*args, **plot_kwargs)
 

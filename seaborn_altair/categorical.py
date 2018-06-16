@@ -303,27 +303,13 @@ def factorplot(
         err = "Plot kind '{}' is not recognized".format(kind)
         raise ValueError(err)
 
-    # Alias the input variables to determine categorical order and palette
-    # correctly in the case of a count plot
-    if kind == "count":
-        if x is None and y is not None:
-            x_, y_, orient = y, y, "h"
-        elif y is None and x is not None:
-            x_, y_, orient = x, x, "v"
-        else:
-            raise ValueError("Either `x` or `y` must be None for count plots")
-    else:
-        x_, y_ = x, y
-
     # Determine keyword arguments for the facets
     facet_kws = {} if facet_kws is None else facet_kws
     facet_kws.update(data=data, row=row, col=col, size=size, aspect=aspect)
 
     # Determine keyword arguments for the plotting function
-    plot_kws = dict(
-        orient=orient, color=color, palette=palette,
-    )
-    plot_kws.update(kwargs)
+    plot_kws = kwargs
+    plot_kws.update(orient=orient, color=color, palette=palette)
 
     if kind in ["bar", "point"]:
         plot_kws.update(estimator=estimator, ci=ci)
