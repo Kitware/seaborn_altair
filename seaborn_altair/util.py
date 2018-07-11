@@ -4,6 +4,14 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib as mpl
+import six
+
+def dtype_to_vega_type(t):
+    if t == np.dtype('datetime64[ns]'):
+        return 'temporal'
+    if t == np.float64 or t == np.int64:
+        return 'quantitative'
+    return 'nominal'
 
 def size_chart(chart, size, aspect):
     dpi = mpl.rcParams['figure.dpi']
@@ -14,10 +22,12 @@ def size_chart(chart, size, aspect):
         chart.width = aspect*size*dpi
 
 def vega_color(color):
+    if isinstance(color, six.string_types) and (color.startswith('rgb(') or color.startswith('rgba(')):
+        return color
     c = to_rgba(color)
     return "rgba(%s,%s,%s,%s)" % (c[0]*255, c[1]*255, c[2]*255, c[3])
 
-def vega_palette(palette, color, saturation):
+def vega_palette(palette, color=None, saturation=1):
     if palette:
         pal = sns.color_palette(palette)
     elif color:

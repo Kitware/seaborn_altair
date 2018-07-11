@@ -1,17 +1,46 @@
 import altair as alt
 import numpy as np
+import pandas as pd
 import warnings
 
-from .util import size_chart, vega_color, vega_palette
+from .util import dtype_to_vega_type, size_chart, vega_color, vega_palette
 
-def dtype_to_vega_type(t):
-    if t == np.dtype('datetime64[ns]'):
-        return 'temporal'
-    if t == np.float64 or t == np.int64:
-        return 'quantitative'
-    return 'nominal'
+
+def fill_between(x, y1, y2, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
+    if data is None:
+        xname = x.name if isinstance(x, pd.Series) else "x"
+        data = pd.DataFrame({xname: x})
+        x = xname
+        if y1 is not None:
+            y1name = y1.name if isinstance(y1, pd.Series) else "y1"
+            data[y1name] = y1
+            y1 = y1name
+        if y2 is not None:
+            y2name = y2.name if isinstance(y2, pd.Series) else "y2"
+            data[y2name] = y2
+            y2 = y2name
+
+    encodings = {
+        "x": alt.X(field=x, type=dtype_to_vega_type(data[x].dtype)),
+        "y": alt.Y(field=y1, type="quantitative"),
+        "y2": alt.Y(field=y2, type="quantitative"),
+    }
+    if color:
+        if color in list(data.columns):
+            encodings["color"] = alt.Color(field=color, type="nominal")
+        else:
+            encodings["color"] = alt.Color(value=vega_color(color))
+
+    chart = alt.Chart(data).mark_area().encode(**encodings)
+    size_chart(chart, size, aspect)
+    pal = vega_palette(palette, None, saturation)
+    return chart.configure_range(category=pal)
 
 def hist(x, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
+    if data is None:
+        data = pd.DataFrame({"x": x})
+        x = "x"
+
     encodings = {
         "x": alt.X(bin=True, field=x, type="quantitative"),
         "y": alt.Y(aggregate="count", type="quantitative"),
@@ -28,12 +57,23 @@ def hist(x, color=None, data=None, palette=None, saturation=1, size=None, aspect
     return chart.configure_range(category=pal)
 
 def scatter(x, y, s=None, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
+    if data is None:
+        xname = x.name if isinstance(x, pd.Series) else "x"
+        data = pd.DataFrame({xname: x})
+        x = xname
+        if y is not None:
+            yname = y.name if isinstance(y, pd.Series) else "y"
+            data[yname] = y
+            y = yname
+
     encodings = {
-        "x": alt.X(field=x, type="quantitative"),
-        "y": alt.Y(field=y, type="quantitative"),
+        "x": alt.X(field=x, type="quantitative", axis={"title": x}),
+        "y": alt.Y(field=y, type="quantitative", axis={"title": y}),
     }
     if color:
-        if color in list(data.columns):
+        if isinstance(color, alt.Color):
+            encodings["color"] = color
+        elif color in list(data.columns):
             encodings["color"] = alt.Color(field=color, type="nominal")
         else:
             encodings["color"] = alt.Color(value=vega_color(color))
@@ -44,6 +84,13 @@ def scatter(x, y, s=None, color=None, data=None, palette=None, saturation=1, siz
     return chart.configure_range(category=pal)
 
 def plot(x, y, s=None, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
+    if data is None:
+        data = pd.DataFrame({"x": x})
+        x = "x"
+        if y is not None:
+            data["y"] = y
+            y = "y"
+
     encodings = {
         "x": alt.X(field=x, type=dtype_to_vega_type(data[x].dtype)),
         "y": alt.Y(field=y, type="quantitative"),
