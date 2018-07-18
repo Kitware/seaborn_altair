@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
-from .util import dtype_to_vega_type, size_chart, vega_color, vega_palette
+from .util import build_dataframe, dtype_to_vega_type, size_chart, vega_color, vega_palette
 
 
 def fill_between(x, y1, y2, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
@@ -58,13 +58,8 @@ def hist(x, color=None, data=None, palette=None, saturation=1, size=None, aspect
 
 def scatter(x, y, s=None, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
     if data is None:
-        xname = x.name if isinstance(x, pd.Series) else "x"
-        data = pd.DataFrame({xname: x})
-        x = xname
-        if y is not None:
-            yname = y.name if isinstance(y, pd.Series) else "y"
-            data[yname] = y
-            y = yname
+        data, fields = build_dataframe({"x": x, "y": y})
+        x, y = fields["x"], fields["y"]
 
     encodings = {
         "x": alt.X(field=x, type="quantitative", axis={"title": x}),
@@ -85,11 +80,8 @@ def scatter(x, y, s=None, color=None, data=None, palette=None, saturation=1, siz
 
 def plot(x, y, s=None, color=None, data=None, palette=None, saturation=1, size=None, aspect=1):
     if data is None:
-        data = pd.DataFrame({"x": x})
-        x = "x"
-        if y is not None:
-            data["y"] = y
-            y = "y"
+        data, fields = build_dataframe({"x": x, "y": y})
+        x, y = fields["x"], fields["y"]
 
     encodings = {
         "x": alt.X(field=x, type=dtype_to_vega_type(data[x].dtype)),

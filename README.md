@@ -48,7 +48,7 @@ This is only a proof of concept at this time. Only a subset of Seaborn plots (th
 * rugplot Plot datapoints in an array as sticks on an axis.
 
 ### Regression plots
-* regplot Plot data and a linear regression model fit.
+* [regplot](http://kitware.github.io/seaborn_altair/regplot.html) Plot data and a linear regression model fit.
 * residplot Plot the residuals of a linear regression.
 
 ### Matrix plots

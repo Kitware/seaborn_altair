@@ -6,6 +6,18 @@ import seaborn as sns
 import matplotlib as mpl
 import six
 
+def build_dataframe(fields):
+    field_names = {}
+    data = pd.DataFrame()
+    for name, field in six.iteritems(fields):
+        if isinstance(field, pd.Series):
+            fname = field.name
+        else:
+            fname = name
+        data[fname] = field
+        field_names[name] = fname
+    return data, field_names
+
 def dtype_to_vega_type(t):
     if t == np.dtype('datetime64[ns]'):
         return 'temporal'
