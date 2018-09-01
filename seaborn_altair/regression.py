@@ -1,6 +1,7 @@
 import altair as alt
 import pandas as pd
 import seaborn as sns
+import six
 from .util import build_dataframe, size_chart, vega_palette
 from .pyplot import fill_between, plot, scatter as pscatter
 
@@ -12,7 +13,7 @@ def regplot(
     scatter=True, fit_reg=True, ci=95, n_boot=1000, units=None,
     order=1, logistic=False, lowess=False, robust=False, logx=False,
     color=None, scatter_kws={}, line_kws={}, ax=None,
-    palette=None, size=None, aspect=1, color_scale=None
+    palette=None, height=None, aspect=1, color_scale=None
 ):
 
     if data is None:
@@ -91,7 +92,10 @@ def regplot(
             layers += plot_regression(data, color)
 
     for layer in layers:
-        layer.mark = dict(type=layer.mark, clip=True)
+        if isinstance(layer.mark, six.string_types):
+            layer.mark = dict(type=layer.mark, clip=True)
+        else:
+            layer.mark.clip = True
         layer.encoding.x.scale=alt.Scale(domain=x_range, nice=False)
         if y_range is not None:
             layer.encoding.y.scale=alt.Scale(domain=y_range, nice=False)
@@ -104,7 +108,7 @@ def regplot(
 def lmplot(
     x, y, data, hue=None, col=None, row=None, palette=None,
     x_estimator=None, x_bins=None, x_ci="ci",
-    col_wrap=None, size=5, aspect=1,
+    col_wrap=None, height=5, aspect=1,
     hue_order=None, col_order=None, row_order=None,
     scatter=True, fit_reg=True, ci=95, n_boot=1000, truncate=False,
     units=None, order=1, logistic=False, lowess=False, robust=False,
@@ -146,7 +150,7 @@ def lmplot(
                 order=order, logistic=logistic, lowess=lowess, robust=robust, logx=logx,
                 scatter_kws=scatter_kws, line_kws=line_kws, color_scale=color_scale,
             )
-            size_chart(chart, size, aspect)
+            size_chart(chart, height, aspect)
             chart.title = ("%s = %s" % (row, r) if row else "") + (" | " if row and col else "") + ("%s = %s" % (col, c) if col else "")
             chart_row.append(chart)
             if col_wrap is not None and len(chart_row) >= col_wrap:

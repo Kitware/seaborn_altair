@@ -1,6 +1,7 @@
 /dist
 *.egg-info
 .ipynb_checkpoints
+.vs
 .vscode
 *.pyc
 __pycache__
