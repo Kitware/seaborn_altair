@@ -9,10 +9,10 @@ __all__ = ["FacetGrid"]
 class FacetGrid():
     """Subplot grid for plotting conditional relationships."""
 
-    def __init__(self, data, row=None, col=None, hue=None, palette=None, size=3, aspect=1):
+    def __init__(self, data, row=None, col=None, hue=None, palette=None, height=3, aspect=1):
         self.hue = hue
         self.palette = palette
-        self.size = size
+        self.height = height
         self.aspect = aspect
 
         self.chart = alt.Chart(data).mark_point()
@@ -34,7 +34,7 @@ class FacetGrid():
     def map_dataframe(self, func, *args, **kwargs):
         plot_kwargs = dict(
             color=self.hue,
-            palette=self.palette, size=self.size,
+            palette=self.palette, size=self.height,
             aspect=self.aspect, data=self.chart.data
         )
         plot_kwargs.update(kwargs)

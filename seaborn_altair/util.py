@@ -10,12 +10,15 @@ def build_dataframe(fields):
     field_names = {}
     data = pd.DataFrame()
     for name, field in six.iteritems(fields):
-        if isinstance(field, pd.Series):
-            fname = field.name
+        if field is not None:
+            if isinstance(field, pd.Series):
+                fname = field.name
+            else:
+                fname = name
+            data[fname] = field
+            field_names[name] = fname
         else:
-            fname = name
-        data[fname] = field
-        field_names[name] = fname
+            field_names[name] = None
     return data, field_names
 
 def dtype_to_vega_type(t):
@@ -37,21 +40,36 @@ def vega_color(color):
     if isinstance(color, six.string_types) and (color.startswith('rgb(') or color.startswith('rgba(')):
         return color
     c = to_rgba(color)
-    return "rgba(%s,%s,%s,%s)" % (c[0]*255, c[1]*255, c[2]*255, c[3])
+    return "rgba(%s,%s,%s,%s)" % (int(c[0]*255), int(c[1]*255), int(c[2]*255), c[3])
 
-def vega_palette(palette, color=None, saturation=1):
+def vega_palette(palette, color=None, saturation=1, vega_type="nominal"):
     if palette:
-        pal = sns.color_palette(palette)
+        if isinstance(palette, mpl.colors.Colormap):
+            pal = palette.colors
+        else:
+            pal = sns.color_palette(palette)
     elif color:
         pal = [color]
-    else:
+    elif vega_type == "nominal":
         pal = sns.color_palette()
+    else:
+        pal = sns.cubehelix_palette(0, as_cmap=True).colors
 
     if saturation < 1:
         pal = sns.color_palette(pal, desat=saturation)
 
     pal = sns.color_palette(pal)
     return [vega_color(c) for c in pal]
+
+def vega_semantic_type(data):
+    try:
+        float_data = data.astype(np.float)
+        values = np.unique(float_data.dropna())
+        if np.array_equal(values, np.array([0., 1.])):
+            return "nominal"
+        return "quantitative"
+    except (ValueError, TypeError):
+        return "nominal"
 
 # From seaborn.categorical
 def infer_orient(x, y, orient=None):

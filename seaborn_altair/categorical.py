@@ -4,7 +4,7 @@ import pandas as pd
 from .util import infer_orient, size_chart, vega_color, vega_palette
 from .axisgrid import FacetGrid
 
-__all__ = ["boxplot", "factorplot", "stripplot", "pointplot", "barplot", "countplot"]
+__all__ = ["boxplot", "catplot", "stripplot", "pointplot", "barplot", "countplot"]
 
 def _bar_encodings(x, y, xs, ys, hue, dodge, estimator):
     encodings = {
@@ -290,9 +290,9 @@ def boxplot(
     pal = vega_palette(palette, color, saturation)
     return chart.configure_range(category=pal)
 
-def factorplot(
+def catplot(
     x=None, y=None, hue=None, data=None, row=None, col=None,
-    estimator=np.mean, ci=95, kind="point", size=None, aspect=1,
+    estimator=np.mean, ci=95, kind="point", height=None, aspect=1,
     orient=None, color=None, palette=None, facet_kws=None, **kwargs
 ):
 
@@ -305,7 +305,7 @@ def factorplot(
 
     # Determine keyword arguments for the facets
     facet_kws = {} if facet_kws is None else facet_kws
-    facet_kws.update(data=data, row=row, col=col, size=size, aspect=aspect)
+    facet_kws.update(data=data, row=row, col=col, height=height, aspect=aspect)
 
     # Determine keyword arguments for the plotting function
     plot_kws = kwargs
